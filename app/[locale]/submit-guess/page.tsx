@@ -4,7 +4,6 @@
 
 import React, { Suspense } from 'react';
 import GuessForm from '@/components/forms/GuessForm';
-// import LanguageSwitcher from '@/components/layout/LanguageSwitcher'; // Reusable
 import { getTranslations } from 'next-intl/server';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import HomeButton from '@/components/navigation/HomeButton';
@@ -34,7 +33,7 @@ export default async function SubmitGuessPage({ params }: { params: { locale: st
       {/* Background Image */}
       <div className="fixed inset-0 z-0">
         <Image
-          src="/images/image.png"
+          src="/images/image.png" // Keeping the original image.png
           alt="Background"
           fill
           priority
@@ -46,7 +45,8 @@ export default async function SubmitGuessPage({ params }: { params: { locale: st
       <main className="relative z-10 flex min-h-screen flex-col items-center pt-10 p-6">
         <div className="max-w-md w-full bg-[#222831] backdrop-blur-md p-6 rounded-lg shadow-md">
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-white">{t('pageTitle')}</h1>
+            <h1 className="text-3xl font-bold text-white">{t('flowerPageTitle')}</h1>
+            <p className="text-gray-300 mt-2">{t('flowerSubtitle')}</p>
           </div>
           {/* Suspense is needed if parent components read searchParams */}
           {/* Since GuessForm is 'use client' and uses the hook directly, it should work, */}

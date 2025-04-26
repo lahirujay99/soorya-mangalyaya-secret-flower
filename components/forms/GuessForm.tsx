@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, FormEvent, ChangeEvent, useCallback } from 'react';
+import React, { useState, useEffect, FormEvent, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -10,14 +10,15 @@ import ErrorMessage from '../feedback/ErrorMessage';
 import LoadingSpinner from '../ui/LoadingSpinner';
 
 // Utility function to throttle API requests during high traffic
-const throttle = (func: Function, delay: number) => {
+const throttle = <T extends (...args: any[]) => any>(func: T, delay: number): ((...args: Parameters<T>) => ReturnType<T> | undefined) => {
   let lastCall = 0;
-  return (...args: any[]) => {
+  return (...args: Parameters<T>) => {
     const now = Date.now();
     if (now - lastCall >= delay) {
       lastCall = now;
       return func(...args);
     }
+    return undefined;
   };
 };
 
@@ -30,7 +31,7 @@ const GuessForm: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [fullName, setFullName] = useState<string>('');
   const [contactNumber, setContactNumber] = useState<string>('');
-  const [guess, setGuess] = useState<string>('');
+  const [flowerNameGuess, setFlowerNameGuess] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,59 +48,61 @@ const GuessForm: React.FC = () => {
     }
   }, [searchParams, t]);
 
-  // Ensure only numeric input for guess field
-  const handleGuessChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Only allow empty string or numeric values
-    if (value === '' || /^\d+$/.test(value)) {
-      setGuess(value);
-    }
-  };
-
   // Throttled API submission function - helps during high traffic by limiting frequent retries
-  const submitToApi = useCallback(throttle(async (payload: any) => {
-    try {
-      setIsSubmitting(true);
-      
-      const response = await fetch('/api/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        // Add timeout for network requests
-        signal: AbortSignal.timeout(10000) // 10-second timeout
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        // Handle rate limiting explicitly
-        if (response.status === 429) {
-          setError(t('Errors.tooManyRequests'));
-          // Increment retry count
-          setRetryCount(prev => prev + 1);
-          return false;
-        }
+  const submitToApi = useCallback(async (payload: {
+    tokenCode: string;
+    contestType: string;
+    fullName: string;
+    contactNumber: string;
+    secretFlowerName: string;
+  }): Promise<boolean> => {
+    const throttledSubmit = throttle(async (submitPayload: typeof payload): Promise<boolean> => {
+      try {
+        setIsSubmitting(true);
         
-        setError(result.message || t('Errors.submissionError'));
+        const response = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(submitPayload),
+          // Add timeout for network requests
+          signal: AbortSignal.timeout(10000) // 10-second timeout
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          // Handle rate limiting explicitly
+          if (response.status === 429) {
+            setError(t('Errors.tooManyRequests'));
+            // Increment retry count
+            setRetryCount(prev => prev + 1);
+            return false;
+          }
+          
+          setError(result.message || t('Errors.submissionError'));
+          return false;
+        } else {
+          console.log('Submission successful:', result);
+          router.push('/confirmation');
+          return true;
+        }
+      } catch (err: unknown) {
+        console.error('Network or fetch error:', err);
+        // Handle abort/timeout explicitly
+        if (err instanceof Error && err.name === 'AbortError') {
+          setError(t('Errors.requestTimeout'));
+        } else {
+          setError(t('Errors.networkError'));
+        }
         return false;
-      } else {
-        console.log('Submission successful:', result);
-        router.push('/confirmation');
-        return true;
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (err: any) {
-      console.error('Network or fetch error:', err);
-      // Handle abort/timeout explicitly
-      if (err.name === 'AbortError') {
-        setError(t('Errors.requestTimeout'));
-      } else {
-        setError(t('Errors.networkError'));
-      }
-      return false;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, 1000), [t, router]); // 1-second throttle between submissions
+    }, 1000);
+    
+    const result = throttledSubmit(payload);
+    return result !== undefined ? result : Promise.resolve(false);
+  }, [t, router]);
 
   // Handle Form Submission
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -123,27 +126,19 @@ const GuessForm: React.FC = () => {
         setIsLoading(false);
         return;
     }
-    if (guess === '') {
-        setError(t('Errors.guessRequiredPapaya'));
+    if (!flowerNameGuess.trim()) {
+        setError(t('Errors.guessRequiredFlower'));
         setIsLoading(false);
         return;
-    }
-
-    // Type specific guess validation
-    const numGuess = parseInt(guess, 10);
-    if (isNaN(numGuess) || numGuess <= 0) {
-      setError(t('Errors.guessInvalidFormat'));
-      setIsLoading(false);
-      return;
     }
 
     // Prepare Payload
     const payload = {
       tokenCode: token,
-      contestType: 'papaya',
+      contestType: 'flower',
       fullName: fullName.trim(),
       contactNumber: contactNumber.trim(),
-      guess: numGuess,
+      secretFlowerName: flowerNameGuess.trim(),
     };
 
     // Use the throttled submission function
@@ -167,11 +162,11 @@ const GuessForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold text-center mb-4 text-white">{t('papayaSeedTitle')}</h2>
+      <h2 className="text-xl font-semibold text-center mb-4 text-white">{t('secretFlowerTitle')}</h2>
 
       {/* Display errors */}
       {error && <ErrorMessage message={error}/>}
-      
+
       {/* Show high traffic message during retry attempts */}
       {showRetryMessage && (
         <div className="text-amber-200 text-sm p-2 bg-amber-900/20 rounded-md mb-4">
@@ -198,17 +193,15 @@ const GuessForm: React.FC = () => {
         disabled={isLoading || isSubmitting}
       />
 
-      {/* Papaya Seed Count Guess Input */}
+      {/* Secret Flower Name Guess Input */}
       <Input
-        id="guess"
-        label={t('guessLabelPapaya')}
-        type="number"
-        value={guess}
-        onChange={handleGuessChange}
+        id="flowerNameGuess"
+        label={t('guessLabelFlower')}
+        type="text"
+        value={flowerNameGuess}
+        onChange={(e) => setFlowerNameGuess(e.target.value)}
         required
         disabled={isLoading || isSubmitting}
-        min="1"
-        pattern="\d+"
       />
 
       {/* Submission Button with more detailed loading states */}

@@ -1,7 +1,7 @@
 {
     "HomePage": {
       "mainTitle": "Wasath Siriya Sooriya Mangalya 2025",
-      "subTitle": "Papaya Seed Count Guessing Contest!",
+      "subTitle": "Secret Flower Name Guessing Contest!",
       "poweredBy": "[powered by - ICT and Digitalization Division - Presidential Secretariat]"
     },
     "TokenEntry": {
@@ -17,17 +17,21 @@
     },
     "GuessPage": {
       "pageTitle": "Submit Your Guess",
+      "flowerPageTitle": "Secret Flower Name Contest",
+      "flowerSubtitle": "Guess the name of the secret flower to win exciting prizes!",
       "backToHome": "Back to Home",
-      "poweredBy": "[powered by - ICT and Digitalization Division]"
+      "poweredBy": "[powered by - ICT and Digitalization Division - Presidential Secretariat]"
     },
     "GuessForm": {
       "title": "Submit Your Guess",
       "papayaSeedTitle": "Papaya Seed Count Guess",
+      "secretFlowerTitle": "Secret Flower Name Guess",
       "papaya": "Papaya Seed Count",
       "nameLabel": "Full Name",
       "nicLabel": "NIC (Optional)",
       "contactLabel": "Contact Number",
       "guessLabelPapaya": "Your Guess (Number of Seeds)",
+      "guessLabelFlower": "Secret Flower Name",
       "submitButton": "Submit Guess",
       "submittingButton": "Submitting...",
       "processingButton": "Processing...",
@@ -40,7 +44,7 @@
       "title": "Submission Received!",
       "message": "Thank you for participating! Results will be announced soon.",
       "backHomeLink": "Back to Home",
-      "poweredBy": "[powered by - ICT and Digitalization Division]"
+      "poweredBy": "[powered by - ICT and Digitalization Division - Presidential Secretariat]"
     },
     "Errors": {
       "tokenRequired": "Please enter your token code.",
@@ -48,6 +52,7 @@
       "nameRequired": "Full name is required.",
       "contactRequired": "Contact number is required.",
       "guessRequiredPapaya": "Please enter your guess for the number of seeds.",
+      "guessRequiredFlower": "Please enter your guess for the secret flower name.",
       "guessInvalidFormat": "The guess format is not valid. Please enter a positive number.",
       "submissionError": "An error occurred during submission. Please try again later.",
       "networkError": "Network error. Please check your connection and try again.",

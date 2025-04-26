@@ -4,17 +4,15 @@ import prisma from '@/lib/prisma'; // Import the singleton instance
 import { z } from 'zod'; // Using Zod for validation
 import { createRateLimitMiddleware } from '@/lib/rate-limit';
 import { tokenCache } from '@/lib/cache'; // Import the cache for invalidation
+import { getCurrentDateInSriLankaTimezone } from '@/lib/date-utils'; // Import the timezone utility
 
-// Define expected input schema using Zod - updated to focus on papaya only
+// Define expected input schema using Zod - updated to focus on flower name guessing
 const submitSchema = z.object({
   tokenCode: z.string().min(1, 'Token is required'),
-  contestType: z.literal('papaya'), // Only allow papaya contest type
+  contestType: z.literal('flower'), // Only allow flower contest type
   fullName: z.string().min(1, 'Full Name is required'),
   contactNumber: z.string().min(1, 'Contact Number is required'),
-  guess: z.number({
-    required_error: 'Guess is required',
-    invalid_type_error: 'Guess must be a number'
-  }).int('Guess must be a whole number').positive('Guess must be a positive number'),
+  secretFlowerName: z.string().min(1, 'Secret flower name guess is required'),
 });
 
 // Configure rate limiting - more strict for submissions (5 per minute)
@@ -88,10 +86,13 @@ export async function POST(req: NextRequest) {
       return addCacheHeaders(response);
     }
 
-    const { tokenCode, fullName, contactNumber, guess } = validation.data;
+    const { tokenCode, fullName, contactNumber, secretFlowerName } = validation.data;
     
     // Create cache key outside of transaction for later use
     const cacheKey = `token:${tokenCode}`;
+
+    // Get current time in Sri Lanka timezone using our utility function
+    const submittedAt = getCurrentDateInSriLankaTimezone();
 
     // Execute core logic within a Prisma Transaction with optimized queries
     try {
@@ -117,15 +118,16 @@ export async function POST(req: NextRequest) {
           throw new Error('TOKEN_ALREADY_USED');
         }
 
-        // Create the response record with only required fields
-        const response = await tx.response.create({
+        // Create the flowerResponse record with Sri Lanka timezone
+        const response = await tx.flowerResponse.create({
           data: {
-            contest_type: 'papaya',
+            id: crypto.randomUUID(), // Generate a random UUID for the response
+            contest_type: 'flower',
             full_name: fullName,
             contact_number: contactNumber,
-            papaya_seed_guess: guess,
+            secret_flower_name: secretFlowerName,
             token_id: token.id,
-            submitted_at: new Date(),
+            submitted_at: submittedAt, // Use our timezone-adjusted timestamp
           },
           select: {
             id: true
@@ -137,7 +139,7 @@ export async function POST(req: NextRequest) {
           where: { id: token.id },
           data: {
             is_used: true,
-            used_at: new Date(),
+            used_at: submittedAt, // Use the same timestamp for consistency
           },
           select: {
             id: true
