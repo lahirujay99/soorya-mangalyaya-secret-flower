@@ -1,0 +1,61 @@
+{
+    "HomePage": {
+      "mainTitle": "Wasath Siriya Sooriya Mangalya 2025",
+      "subTitle": "Papaya Seed Count Guessing Contest!",
+      "poweredBy": "[powered by - ICT and Digitalization Division - Presidential Secretariat]"
+    },
+    "TokenEntry": {
+      "title": "Enter Your Token",
+      "instructions": "Enter the unique token code provided to participate.",
+      "tokenLabel": "Token Code",
+      "placeholder": "Enter token here (e.g., YF0345)",
+      "validateButton": "Proceed",
+      "validatingButton": "Processing...",
+      "processingButton": "Processing...",
+      "highTrafficWarning": "We're experiencing high traffic. Please be patient.",
+      "retryMessage": "Having trouble? Wait a moment and try again."
+    },
+    "GuessPage": {
+      "pageTitle": "Submit Your Guess",
+      "backToHome": "Back to Home",
+      "poweredBy": "[powered by - ICT and Digitalization Division]"
+    },
+    "GuessForm": {
+      "title": "Submit Your Guess",
+      "papayaSeedTitle": "Papaya Seed Count Guess",
+      "papaya": "Papaya Seed Count",
+      "nameLabel": "Full Name",
+      "nicLabel": "NIC (Optional)",
+      "contactLabel": "Contact Number",
+      "guessLabelPapaya": "Your Guess (Number of Seeds)",
+      "submitButton": "Submit Guess",
+      "submittingButton": "Submitting...",
+      "processingButton": "Processing...",
+      "highTrafficMessage": "We're experiencing high traffic. Please wait a moment before trying again.",
+      "Errors": {
+        "tokenMissing": "Token not found. Please go back and enter your token."
+      }
+    },
+    "Confirmation": {
+      "title": "Submission Received!",
+      "message": "Thank you for participating! Results will be announced soon.",
+      "backHomeLink": "Back to Home",
+      "poweredBy": "[powered by - ICT and Digitalization Division]"
+    },
+    "Errors": {
+      "tokenRequired": "Please enter your token code.",
+      "tokenMissing": "Token not found. Please go back and enter your token.",
+      "nameRequired": "Full name is required.",
+      "contactRequired": "Contact number is required.",
+      "guessRequiredPapaya": "Please enter your guess for the number of seeds.",
+      "guessInvalidFormat": "The guess format is not valid. Please enter a positive number.",
+      "submissionError": "An error occurred during submission. Please try again later.",
+      "networkError": "Network error. Please check your connection and try again.",
+      "formIncomplete": "Please fill in all required fields.",
+      "invalidToken": "Invalid token provided.",
+      "tokenNotValid": "This token is not valid for the contest.",
+      "tokenUsed": "This token has already been used.",
+      "tooManyRequests": "Too many requests. Please wait and try again.",
+      "requestTimeout": "Request timed out. The server might be busy."
+    }
+  }

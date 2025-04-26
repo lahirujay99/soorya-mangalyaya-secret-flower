@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Token {
+  id             String          @id @default(uuid())
+  token_code     String          @unique
+  is_valid       Boolean         @default(true)
+  is_used        Boolean         @default(false)
+  used_at        DateTime?
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  FlowerResponse FlowerResponse?
+  response       Response?
+
+  @@index([token_code])
+  @@index([is_used])
+}
+
+model Response {
+  id                String   @id @default(uuid())
+  contest_type      String
+  full_name         String
+  contact_number    String
+  papaya_seed_guess Int
+  submitted_at      DateTime @default(now())
+  token_id          String   @unique
+  token             Token    @relation(fields: [token_id], references: [id])
+
+  @@index([token_id])
+  @@index([contest_type])
+}
+
+model FlowerResponse {
+  id                 String   @id
+  contest_type       String
+  full_name          String
+  contact_number     String
+  secret_flower_name String
+  submitted_at       DateTime @default(now())
+  token_id           String   @unique
+  Token              Token    @relation(fields: [token_id], references: [id])
+
+  @@index([contest_type])
+  @@index([token_id])
+}
