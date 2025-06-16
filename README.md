@@ -1,3 +1,5 @@
+This project is a Next.js web application for the 'Wasath Siriya Sooriya Mangalya 2025' contest. Participants can validate a token to submit their guesses for a secret flower name and a papaya seed count in hopes of winning.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
